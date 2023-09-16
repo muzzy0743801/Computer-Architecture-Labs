@@ -1,0 +1,108 @@
+#include <IRremote.h>
+
+#include <LiquidCrystal.h>
+
+#include <Servo.h>
+
+const int RECV_PIN = 6;
+
+int pos = 0;
+Servo myservo;
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+#define code1 2295
+#define code2 34935
+#define code3 18615
+#define code4 10455
+#define code5 43095
+#define code6 26775
+#define code7 6375
+#define code8 39015
+#define code9 22695
+
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+void setup(){
+  
+  lcd.begin(16,2);
+  
+  irrecv.enableIRIn();
+  
+  myservo.attach(9);
+  
+  myservo.write(0);
+  
+}
+
+void loop(){
+  
+  if (irrecv.decode(&results)){
+    
+    unsigned int value = results.value;
+    
+    switch(value){
+      
+      case code1:
+      myservo.write(pos=20);
+      lcd.print(pos);
+      break;
+      
+      
+      case code2:
+      myservo.write(pos=40);
+      lcd.print(pos);
+      break;
+      
+      
+      case code3:
+      myservo.write(pos=60);
+      lcd.print(pos);
+      break;
+      
+      
+      case code4:
+      myservo.write(pos=80);
+      lcd.print(pos);
+      break;
+      
+      
+      case code5:
+      myservo.write(pos=100);
+      lcd.print(pos);
+      break;
+      
+      
+      case code6:
+      myservo.write(pos=120);
+      lcd.print(pos);
+      break;
+      
+      
+      case code7:
+      myservo.write(pos=140);
+      lcd.print(pos);
+      break;
+      
+      
+      case code8:
+      myservo.write(pos=160);
+      lcd.print(pos);
+      break;
+      
+      
+      case code9:
+      myservo.write(pos=180);
+      lcd.print(pos);
+      break;
+    
+    }
+    
+    delay(1000); 
+    lcd.clear();
+    irrecv.resume();
+  
+  }
+
+}

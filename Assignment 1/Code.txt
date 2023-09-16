@@ -1,0 +1,147 @@
+#include <IRremote.h> 
+#include <LiquidCrystal.h>
+
+const int RECV_PIN = 6;
+
+const int trigPin = 9;
+const int echoPin = 8;
+
+int pinTemp = A0;
+
+LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+//Button 1
+#define code1 2295
+//Button 2
+#define code2 34935
+//Button 3
+#define code3 18615
+//Button 4
+#define code4 10455
+//Button 5
+#define code5 43095
+//Button 6
+#define code6 26775
+//Button Power
+#define code7 255
+
+IRrecv irrecv(RECV_PIN);
+decode_results results;
+
+void setup(){
+  
+  lcd.begin(16,2);
+  
+  irrecv.enableIRIn();
+  
+  pinMode(trigPin,OUTPUT);
+  pinMode(echoPin,INPUT);
+  
+  pinMode(pinTemp,INPUT);
+  
+  analogReference(INTERNAL);
+  
+  delay(1000);
+  
+}
+
+float microsecondsToCentimeter(float microseconds){
+  
+  return microseconds / 29 / 2 * 2; //multiplying by 2 at the end because of "irrecv.enableIRIn();" command the value is getting half by itself
+  
+}
+
+float microsecondsToMeter(float microseconds){
+  
+  return microseconds / 29 / 2 * 0.01 * 2; //multiplying by 2 at the end because of "irrecv.enableIRIn();" command the value is getting half by itself
+  
+}
+
+float microsecondsToMillimeter(float microseconds){
+  
+  return microseconds / 29 / 2 * 10 * 2; //multiplying by 2 at the end because of "irrecv.enableIRIn();" command the value is getting half by itself
+  
+}
+
+void loop(){
+  
+  float duration, cm, meter, millimeter;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  cm = microsecondsToCentimeter(duration);
+  meter = microsecondsToMeter(duration);
+  millimeter = microsecondsToMillimeter(duration);
+  
+  int reading = analogRead(A0);
+  float tempC = reading/9.31;
+  float tempF = (tempC * 9.0 / 5.0) + 32.0;
+  float tempK = tempC + 273.15;
+  
+  if (irrecv.decode(&results)){
+    
+    unsigned int value = results.value;
+    
+    switch(value){
+      
+      case code1: //For Distance In Centimeter
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print(cm);
+      lcd.print("CM");
+      break;
+      
+      case code2: //For Distance In Meter
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print(meter);
+      lcd.print("M");
+      break;
+      
+      case code3: //For Distance In Millimeter
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print(millimeter);
+      lcd.print("MM");
+      break;
+      
+      case code4: //For Temperature In Kelvin
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print(tempK);
+      lcd.print("K");
+      break;
+      
+      case code5: //For Temperature In Fahrenheit
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print(tempF);
+      lcd.print("F");
+      break;
+      
+      case code6: //For Temperature In Celsius
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print(tempC);
+      lcd.print("C");
+      break;
+      
+      case code7: //For Power Button
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("Ali Salman");
+      lcd.setCursor(0,1);
+      lcd.print("63758");
+      break;
+    
+    }
+    
+    delay(500); 
+    irrecv.resume();
+  
+  } 
+  
+}
